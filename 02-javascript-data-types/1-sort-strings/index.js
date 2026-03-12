@@ -8,7 +8,7 @@ export function sortStrings(arr, param = 'asc') {
   const newArr = [...arr];
 
   newArr.sort((a, b) => {
-    const result = a.toLowerCase().localeCompare(b.toLowerCase());
+    const result = a.toLowerCase().localeCompare(b.toLowerCase(), ['ru', 'en']);
 
     if (result !== 0) {
       return param === 'asc' ? result : -result;
