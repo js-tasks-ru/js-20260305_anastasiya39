@@ -49,7 +49,6 @@ export default class ColumnChart {
     `;
 
     this.element = element;
-    // ставим ! чтобы сказать TypeScript: "Я точно уверен, что элемент есть"
     this.chartContainer = this.element.querySelector('[data-element="body"]')!;
     this.chartHeader = this.element.querySelector('[data-element="header"]')!;
 
@@ -57,7 +56,6 @@ export default class ColumnChart {
   }
 
   private showSkeleton() {
-    // используем ? чтобы безопасно вызвать innerHTML
     this.chartContainer!.innerHTML = `<img src="/charts-skeleton.svg" alt="loading...">`;
   }
 
