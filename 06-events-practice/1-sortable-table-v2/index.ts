@@ -75,7 +75,7 @@ export default class SortableTable {
 
   private getTableBody(data: SortableTableData[]) {
     return data.map(row => `
-      <a href="/products/${row['title']}" class="sortable-table__row">
+      <a href="/products/${row['id']}" class="sortable-table__row">
         ${this.headers.map(header => {
           const value = row[header.id];
           return header.template ? header.template(value) : `<div class="sortable-table__cell">${value}</div>`;
@@ -143,8 +143,7 @@ export default class SortableTable {
     if (!this.element) return;
 
     this.element.querySelectorAll<HTMLElement>('.sortable-table__cell').forEach(cell => {
-      if (cell.dataset.id === field) cell.dataset.order = order;
-      else delete cell.dataset.order;
+      cell.dataset.order = cell.dataset.id === field ? order : '';
     });
 
     const body = this.element.querySelector<HTMLElement>('[data-element="body"]');

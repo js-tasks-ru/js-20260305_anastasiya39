@@ -69,7 +69,8 @@ export default class ProductForm {
 
     this.subElements = {
       form: this.element.querySelector('[data-element="productForm"]') as HTMLElement,
-      imageListContainer: this.element.querySelector('[data-element="imageListContainer"]') as HTMLElement
+      imageListContainer: this.element.querySelector('[data-element="imageListContainer"]') as HTMLElement,
+      uploadImage: this.element.querySelector('[data-element="uploadImage"]') as HTMLElement
     };
 
     this.initEventListeners();
@@ -97,6 +98,11 @@ export default class ProductForm {
 
           <div class="form-group form-group__wide">
             <label class="form-label">Фото</label>
+
+            <button type="button" class="button-primary-outline" data-element="uploadImage">
+              Загрузить
+            </button>
+
             <div data-element="imageListContainer">
               ${this.getImages()}
             </div>
@@ -187,7 +193,63 @@ export default class ProductForm {
       event.preventDefault();
       this.save();
     });
+
+    this.subElements.uploadImage.addEventListener('click', this.uploadImage);
   }
+
+  private uploadImage = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.click();
+
+    input.onchange = async () => {
+      if (!input.files?.length) return;
+
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('https://api.imgur.com/3/image', {
+        method: 'POST',
+        headers: {
+          Authorization: `Client-ID ${IMGUR_CLIENT_ID}`
+        },
+        body: formData
+      });
+
+      const result: ImgurUploadResponse = await response.json();
+
+      const image: ProductImage = {
+        url: result.data.link,
+        source: file.name
+      };
+
+      const container = this.subElements.imageListContainer;
+
+      let list = container.querySelector('ul');
+      if (!list) {
+        list = document.createElement('ul');
+        list.className = 'sortable-list';
+        container.appendChild(list);
+      }
+
+      const item = document.createElement('li');
+      item.className = 'products-edit__imagelist-item sortable-list__item';
+
+      item.innerHTML = `
+        <input type="hidden" name="url" value="${image.url}">
+        <input type="hidden" name="source" value="${image.source}">
+        <span>
+          <img class="sortable-table__cell-img"
+            src="${image.url}"
+            alt="${image.source}">
+        </span>
+      `;
+
+      list.appendChild(item);
+    };
+  };
 
   async save(): Promise<void> {
     const form = this.subElements.form as HTMLFormElement;
@@ -195,12 +257,20 @@ export default class ProductForm {
 
     const data = Object.fromEntries(formData.entries());
 
+    const preparedData = {
+      ...data,
+      price: Number(data.price),
+      discount: Number(data.discount),
+      quantity: Number(data.quantity),
+      status: Number(data.status)
+    };
+
     await fetchJson(`${BACKEND_URL}/api/rest/products`, {
       method: this.productId ? 'PATCH' : 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(preparedData)
     });
 
     const eventName = this.productId ? 'product-updated' : 'product-saved';

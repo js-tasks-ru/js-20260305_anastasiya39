@@ -140,13 +140,15 @@ export default class DoubleSlider {
   }
 
   destroy() {
-    if (!this.element) return;
-    this.subElements.thumbLeft.removeEventListener('pointerdown', this.onPointerDown);
-    this.subElements.thumbRight.removeEventListener('pointerdown', this.onPointerDown);
-
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
 
-    this.element.remove();
+    if (this.element) {
+      this.subElements.thumbLeft.removeEventListener('pointerdown', this.onPointerDown);
+      this.subElements.thumbRight.removeEventListener('pointerdown', this.onPointerDown);
+
+      this.element.remove();
+      this.element = null;
+    }
   }
 }

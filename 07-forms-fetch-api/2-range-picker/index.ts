@@ -176,32 +176,17 @@ export default class RangePicker {
         cell.classList.add('rangepicker__selected-between');
       }
     }
-
-    if (fromIso) {
-      const selectedFromElem = element.querySelector(`[data-value="${fromIso}"]`);
-      if (selectedFromElem) {
-        selectedFromElem.closest('.rangepicker__cell')?.classList.add('rangepicker__selected-from');
-      }
-    }
-
-    if (toIso) {
-      const selectedToElem = element.querySelector(`[data-value="${toIso}"]`);
-      if (selectedToElem) {
-        selectedToElem.closest('.rangepicker__cell')?.classList.add('rangepicker__selected-to');
-      }
-    }
   }
 
   private renderCalendar(showDate: Date): string {
     const date = new Date(showDate);
     const getGridStartIndex = (dayIndex: number): number => {
-      const index = dayIndex === 0 ? 6 : (dayIndex - 1); // make Sunday (0) the last day
+      const index = dayIndex === 0 ? 6 : (dayIndex - 1);
       return index + 1;
     };
 
     date.setDate(1);
 
-    // text-transform: capitalize
     const monthStr = date.toLocaleString('ru', { month: 'long' });
 
     let table = `<div class="rangepicker__calendar">
@@ -214,8 +199,6 @@ export default class RangePicker {
       <div class="rangepicker__date-grid">
     `;
 
-    // first day of month starts after a space
-    // * * * 1 2 3 4
     table += `
       <button type="button"
         class="rangepicker__cell"
@@ -237,7 +220,6 @@ export default class RangePicker {
       date.setDate(date.getDate() + 1);
     }
 
-    // close the table
     table += '</div></div>';
 
     return table;
@@ -290,7 +272,6 @@ export default class RangePicker {
     const selector = this.sub('selector');
 
     this.element.remove();
-    // TODO: Warning! To remove listener  MUST be passes the same event phase
     document.removeEventListener('click', this.onDocumentClick, true);
     input.removeEventListener('click', this.onInputClick);
     selector.removeEventListener('click', this.onSelectorClick);
@@ -317,7 +298,7 @@ export default class RangePicker {
     const fromElement = this.sub('from');
     const toElement = this.sub('to');
 
-    fromElement.innerHTML = RangePicker.formatDate(from);
-    toElement.innerHTML = RangePicker.formatDate(to);
+    fromElement.textContent = RangePicker.formatDate(from);
+    toElement.textContent = RangePicker.formatDate(to);
   }
 }

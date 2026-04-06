@@ -33,6 +33,9 @@ export default class Tooltip {
       this.element.classList.add('tooltip');
       document.body.appendChild(this.element);
     }
+    
+    this.element.style.position = 'fixed';
+    this.element.style.zIndex = '1000';
 
     this.element.innerHTML = html;
   }
@@ -43,6 +46,8 @@ export default class Tooltip {
     if (!target) return;
 
     this.render(target.dataset.tooltip || '');
+
+    document.addEventListener('pointermove', this.onPointerMove);
   };
 
   private onPointerOut = (event: PointerEvent) => {
@@ -54,5 +59,16 @@ export default class Tooltip {
       this.element.remove();
       this.element = null;
     }
+
+    document.removeEventListener('pointermove', this.onPointerMove);
+  };
+
+  private onPointerMove = (event: PointerEvent) => {
+    if (!this.element) return;
+
+    const offset = 10;
+
+    this.element.style.left = event.clientX + offset + 'px';
+    this.element.style.top = event.clientY + offset + 'px';
   };
 }
